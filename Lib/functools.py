@@ -606,9 +606,16 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
             root[:] = [root, root, None, None]
             hits = misses = 0
             full = False
+           
+    def cache_exists(*args, **kwds):
+        """Verify whether key exists in cache without updating recency of access."""
+        key = make_key(args, kwds, typed)
+        with lock:
+            return True if cache_get(key) else False  
 
     wrapper.cache_info = cache_info
     wrapper.cache_clear = cache_clear
+    wrapper.cache_exists = cache_exists
     return wrapper
 
 try:
